@@ -10,9 +10,26 @@ navigator.permissions.query ({
    } else if (r.state === `prompt`) {
       console.log (`MIDI prompt`)
    }
-   console.log (r)
 })
 
+navigator.requestMIDIAccess ().then (midi => {
+   startLoggingMIDIInput (midi)
+})
+
+function onMIDIMessage(event) {
+   let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
+   for (const character of event.data) {
+     str += `0x${character.toString(16)} `;
+   }
+   console.log(str);
+ }
+ 
+ function startLoggingMIDIInput(midiAccess) {
+   midiAccess.inputs.forEach((entry) => {
+     entry.onmidimessage = onMIDIMessage;
+   });
+ }
+ 
 
 
 const cnv = document.getElementById (`cnv_element`)
